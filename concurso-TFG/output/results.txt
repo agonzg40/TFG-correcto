@@ -1,1 +1,0 @@
-command_1|go to the kitchen|MOTION(goal:to the kitchen)
