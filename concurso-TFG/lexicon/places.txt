@@ -1,0 +1,18 @@
+kitchen
+fridge
+aisle
+hall
+living room
+bathroom
+bath
+room
+garage
+loft
+shower
+terrace
+playground
+cellar
+counter
+table
+sofa
+floor
