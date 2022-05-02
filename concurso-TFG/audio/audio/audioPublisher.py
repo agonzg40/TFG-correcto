@@ -8,23 +8,19 @@ from std_msgs.msg import String
 
 import stanfordnlp
 
-keywords = [
-    ("command", 1), 
-    ("go", 0)
-]
-
 
 class audioPublisher(Node):
 
     def __init__(self):
         super().__init__('audio_publisher')
-        self.publisher_ = self.create_publisher(String, 'audio', 10)     # CHANGE
-        self.SpeechToString()
-        #self.prueba()
 
+        #Create of the token
+        self.publisher_ = self.create_publisher(String, 'audio', 10) 
+        self.SpeechToString()
 
     def prueba(self):
 
+        #Opening the archive with the verbs
         archiveAux = open("lexicon/verbs.txt","r")
         mensaje = archiveAux.read()
 
@@ -32,6 +28,7 @@ class audioPublisher(Node):
         mensajeFinal = []
         j=0
 
+        #Reading the archive
         for i in range(len(mensaje)):
 
             if(mensaje[i]!="\n"):
@@ -45,38 +42,12 @@ class audioPublisher(Node):
             print(mensajeFinal[i])
         archiveAux.close()
 
-        '''tagger = UnigramTagger(brown.tagged_sents(categories='news')[:500])
-
-        sentence = """I am here to take the tv"""
-        tokens = nltk.word_tokenize(sentence)
-        #print(tokens)
-        #tagged = nltk.pos_tag(tokens)
-        #print(tagged[0])
-
-        #sent = ['Mitchell', 'decried', 'the', 'high', 'rate', 'of', 'unemployment']
-        for word, tag in tagger.tag(tokens):
-            if(tag == "VB"):
-                print(word, '->', tag)
-        
-
-        #for word, tag in tagger.tag(sent):
-            #print(word, '->', tag)
-        
-
-        #nlp = stanfordnlp.Pipeline()
-
-        #cadena = "I am here to watch the tv"
-
-        #doc= nlp(cadena)
-
-        #print(doc[0])'''
-
-
 
     def SpeechToString(self):
         rec = sr.Recognizer()
         seconds = 3
 
+        #Open the microphone to hear the user
         with sr.Microphone() as source:
 
             print("Calibrating")
@@ -87,7 +58,7 @@ class audioPublisher(Node):
             audio = rec.listen(source, timeout=None, phrase_time_limit=None)
 
             text = rec.recognize_google(audio)
-            #text = rec.recognize_sphinx(audio, keyword_entries = keywords)
+            
             print(text)
 
             msg = String()
@@ -100,8 +71,6 @@ def main(args=None):
 
     audio_publisher = audioPublisher()
     audio_publisher.destroy_node()
-    
-    #rclpy.spin(audio_publisher)
 
     rclpy.shutdown()
 

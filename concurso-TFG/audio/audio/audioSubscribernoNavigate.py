@@ -13,17 +13,14 @@ import nltk
 from nltk.corpus import brown
 from nltk.tag import UnigramTagger
 
-from geometry_msgs.msg import PoseStamped
-
-from audio.robot_navigator import BasicNavigator, NavigationResult
-from nav2_msgs.action import NavigateToPose, FollowWaypoints, ComputePathToPose
-
+#Save the output of the program in the archive results
 archive=open("src/concurso-TFG/output/results.txt","w")
 counter = [0]
 
 #Identify if is a source or a goal
 def identify(data, verb, number):
 
+    #Opening the archive with the places
     archiveAux = open("src/concurso-TFG/lexicon/places.txt","r")
     mensaje = archiveAux.read()
 
@@ -33,6 +30,7 @@ def identify(data, verb, number):
 
     #Saving the places of the archive in array places
     for i in range(len(mensaje)):
+
         if(mensaje[i]!="\n"):
             aux += mensaje[i]
         else:
@@ -112,10 +110,14 @@ def identify(data, verb, number):
                     boolean = False
                     last = True
 
+            
+
             if(word == "the"):
                 boolean = True
 
+            
     return goal
+
 
 #Add the goal with verbs that aren't of special type to single verbs
 def addGoal(data, verb):
@@ -157,7 +159,7 @@ def identifyGoalComposed(data, verb):
 def identifyBeneficiary(data):
 
     #Open the archive pronouns
-    archiveAux = open("lexicon/personal_prononouns.txt","r")
+    archiveAux = open("src/concurso-TFG/lexicon/personal_pronouns.txt","r")
     mensaje = archiveAux.read()
 
     aux = ""
@@ -165,6 +167,7 @@ def identifyBeneficiary(data):
     j=0
 
     for i in range(len(mensaje)):
+
         if(mensaje[i]!="\n"):
             aux += mensaje[i]
         else:
@@ -185,35 +188,8 @@ def identifyBeneficiary(data):
 
     return goal
 
-#Class to send the goal to the robot
-class navigateClient(Node):
 
-    def __init__(self):
-        super().__init__('navigate_action_client')
-        self._action_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
-
-    def send_goal(self, x, y):
-
-        navigator = BasicNavigator()
-        navigator.waitUntilNav2Active()
-
-        # Set the robot's goal pose
-        goal_pose = PoseStamped()
-        
-        goal_pose.header.frame_id = 'map'
-        goal_pose.header.stamp = navigator.get_clock().now().to_msg()
-        goal_pose.pose.position.x = x
-        goal_pose.pose.position.y = y
-        goal_pose.pose.position.z = 0.0
-        goal_pose.pose.orientation.x = 4.67
-        goal_pose.pose.orientation.y = 3.86
-        goal_pose.pose.orientation.z = 0.0
-        goal_pose.pose.orientation.w = 1.0
-
-        navigator.goToPose(goal_pose)
-
-
-class audioSubscriber(Node):
+class audioSubscribernoNavigate(Node):
 
     def __init__(self):
         super().__init__('audio_subscriber')
@@ -227,7 +203,7 @@ class audioSubscriber(Node):
         self.subscription   
 
     def listener_callbackS(self, text):
-        self.get_logger().info('I heardsad: "%s"' % text.data)
+        self.get_logger().info('I heard: "%s"' % text.data)
 
         counterAux = 0
 
@@ -247,13 +223,14 @@ class audioSubscriber(Node):
         verb = ""
 
         for i in range(len(mensaje)):
+
             if(mensaje[i]!="\n"):
                 aux += mensaje[i]
             else:
                 mensajeFinal.append(aux)
                 j+=1
                 aux = ""
-                
+
         archiveAux.close()
 
         #Scooch the audio record to count the verbs
@@ -261,7 +238,6 @@ class audioSubscriber(Node):
             for i in range(len(mensajeFinal)):
                 if(word == mensajeFinal[i]):
                     verb = word
-                    print(word)
                     counterAux += 1
 
         #If only appear one verb
@@ -280,7 +256,7 @@ class audioSubscriber(Node):
         
             archive.write("command_%d|%s|%s\n" % (counter[0],data, oration))
 
-    
+
     def singleCommand(self, data, mensajeFinal):
 
         oration = ""
@@ -295,56 +271,32 @@ class audioSubscriber(Node):
                     counter[0] += 1
                     oration = "MOTION(goal:"
                     oration += addGoal(data, mensajeFinal[i])
-                    
-                    #Send the goal to the robot if the verb is go
-                    if(word == "go"):
-                        placeX = 0.0
-                        placeY = 0.0
-
-                        for wordAux, tag in tagger.tag(tokens):
-                            if(wordAux=="kitchen"):
-                                placeX = 4.67
-                                placeY = 3.86
-                            elif(wordAux=="bedroom" or wordAux=="room"):
-                                placeX = 1.65
-                                placeY = 5.14
-                            elif(wordAux=="bathroom" or wordAux=="WC" or wordAux=="bath" or wordAux=="bath" or wordAux=="washroom"):
-                                placeX = 1.51
-                                placeY = 2.34
-                            elif(wordAux=="living" or wordAux=="saloon" or wordAux=="sitting"):
-                                placeX = 4.70
-                                placeY = 1.39
-                            elif(wordAux=="dining" or wordAux=="diner" or wordAux=="canteen"):
-                                placeX = 6.47
-                                placeY = 3.51
-                            elif(wordAux=="hall"):
-                                placeX = 1.77
-                                placeY = 0.00
-                        action_client = navigateClient()
-                        future = action_client.send_goal(placeX, placeY)
-                    	
-                        
+                    break
 
                 elif (word == "search" and word==mensajeFinal[i]):
                     counter[0] += 1
                     oration = "SEARCHING("
                     oration += identify(data, mensajeFinal[i], 0)
+                    break
 
                 elif (word == "take" or word == "get" or word == "grab" or word == "pick" and word==mensajeFinal[i]):
                     counter[0] += 1
                     oration = "TAKING("
                     oration += identify(data, mensajeFinal[i], 0)
+                    break
 
                 elif (word == "place" or word == "put" and word==mensajeFinal[i]):
                     counter[0] += 1
                     oration = "PLACING("
                     oration += identify(data, mensajeFinal[i], 0)
+                    break
 
                 elif (word == "bring" and word==mensajeFinal[i]):
                     counter[0] += 1
                     oration = "BRINGING("
                     oration += identify(data, mensajeFinal[i], 0)
                     oration += identifyBeneficiary(data)
+                    break
 
 
         if(oration == ""):
@@ -353,9 +305,11 @@ class audioSubscriber(Node):
                 oration = "NO_INTERPRETATION"
         
         oration += ")"
-        
+
+
         #Writing the exit in the archive result
         archive.write("command_%d|%s|%s\n" % (counter[0],data, oration))
+
 
     def composedCommand(self, data, mensajeFinal):
 
@@ -368,10 +322,13 @@ class audioSubscriber(Node):
 
         #Scooch the audio record to see what type of verbs has
         for word, tag in tagger.tag(tokens):
+            
             for j in range(len(mensajeFinal)):
+            
                 if(word==mensajeFinal[j] and word != "search" and word != "take" and word != "put" and word != "place" and word != "bring"):
                     i += 1
                     counterAux += 1
+
                     if(i==2):
                         counter[0] += 1
                         oration += "#"
@@ -385,34 +342,9 @@ class audioSubscriber(Node):
                         oration += "MOTION(, goal: "
                         oration += addGoal(data, mensajeFinal[j])
                         oration += ")"
-
-                    #Send the goal to the robot if the verb is go
-                    if(word == "go"):
-                        placeX = 0.0
-                        placeY = 0.0
-
-                        for wordAux, tag in tagger.tag(tokens):
-                            if(wordAux=="kitchen"):
-                                placeX = 4.67
-                                placeY = 3.86
-                            elif(wordAux=="bedroom" or wordAux=="room"):
-                                placeX = 1.65
-                                placeY = 5.14
-                            elif(wordAux=="bathroom" or wordAux=="WC" or wordAux=="bath" or wordAux=="bath" or wordAux=="washroom"):
-                                placeX = 1.51
-                                placeY = 2.34
-                            elif(wordAux=="living" or wordAux=="saloon" or wordAux=="sitting"):
-                                placeX = 4.70
-                                placeY = 1.39
-                            elif(wordAux=="dining" or wordAux=="diner" or wordAux=="canteen"):
-                                placeX = 6.47
-                                placeY = 3.51
-                            elif(wordAux=="hall"):
-                                placeX = 1.77
-                                placeY = 0.00
-                        action_client = navigateClient()
-                        future = action_client.send_goal(placeX, placeY)
                 
+                    
+
                 elif (word == "search" and word==mensajeFinal[j]):
                     i += 1
                     counterAux += 1
@@ -458,7 +390,7 @@ class audioSubscriber(Node):
                         oration += "#"
 
                     oration += "BRINGING("
-                    oration += identify(data, mensajeFinal[j])
+                    oration += identify(data, mensajeFinal[j], i)
                     oration += identifyBeneficiary(data)
                     oration += ")"
 
@@ -485,9 +417,7 @@ def main(args=None):
     
     rclpy.init(args=args)
 
-    audio_subscriber = audioSubscriber()
-    action_client = audioSubscriber()
-    
+    audio_subscriber = audioSubscribernoNavigate()
 
     rclpy.spin(audio_subscriber)
 
