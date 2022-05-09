@@ -3,8 +3,8 @@ from typing import Any
 import rclpy # Python library for ROS 2
 from rclpy.node import Node # Handles the creation of nodes
 from sensor_msgs.msg import Image # Image is the message type
-from cv_bridge import CvBridge # Package to convert between ROS and OpenCV Images
 import cv2 # OpenCV library
+from cv_bridge import CvBridge # Package to convert between ROS and OpenCV Images
 import sys
 from torch import hub # Hub contains other models like FasterRCNN
 
@@ -57,7 +57,7 @@ class ImageSubscriber(Node):
           cv2.putText(current_frame,str(round(confidence*100,2)),(box[0]+200,box[1]+30),
           cv2.FONT_HERSHEY_COMPLEX,1,(0,255,0),2)
     
-      cv2.imshow("camera", current_frame)
+      self.publisher_.publish(self.br.cv2_to_imgmsg(current_frame, encoding=data.encoding))
     
       cv2.waitKey(1)
   
