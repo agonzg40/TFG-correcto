@@ -303,25 +303,36 @@ class audioSubscriber(Node):
 
                         for wordAux, tag in tagger.tag(tokens):
                             if(wordAux=="kitchen"):
-                                placeX = 4.67
-                                placeY = 3.86
+                                placeX = 3.79
+                                placeY = 6.77
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
                             elif(wordAux=="bedroom" or wordAux=="room"):
-                                placeX = 1.65
-                                placeY = 5.14
+                                placeX = 7.5
+                                placeY = 4.89
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
                             elif(wordAux=="bathroom" or wordAux=="WC" or wordAux=="bath" or wordAux=="bath" or wordAux=="washroom"):
                                 placeX = 1.51
                                 placeY = 2.34
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
                             elif(wordAux=="living" or wordAux=="saloon" or wordAux=="sitting"):
-                                placeX = 4.70
-                                placeY = 1.39
+                                placeX = 1.55
+                                placeY = 4.03
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
                             elif(wordAux=="dining" or wordAux=="diner" or wordAux=="canteen"):
                                 placeX = 6.47
                                 placeY = 3.51
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
                             elif(wordAux=="hall"):
                                 placeX = 1.77
                                 placeY = 0.00
-                        action_client = navigateClient()
-                        future = action_client.send_goal(placeX, placeY)
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
+                        
                     	
                         
 
@@ -393,25 +404,41 @@ class audioSubscriber(Node):
 
                         for wordAux, tag in tagger.tag(tokens):
                             if(wordAux=="kitchen"):
-                                placeX = 4.67
-                                placeY = 3.86
+                                placeX = 3.79
+                                placeY = 6.77
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
+
                             elif(wordAux=="bedroom" or wordAux=="room"):
-                                placeX = 1.65
-                                placeY = 5.14
+                                placeX = 7.5
+                                placeY = 4.89
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
+
                             elif(wordAux=="bathroom" or wordAux=="WC" or wordAux=="bath" or wordAux=="bath" or wordAux=="washroom"):
                                 placeX = 1.51
                                 placeY = 2.34
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
+
                             elif(wordAux=="living" or wordAux=="saloon" or wordAux=="sitting"):
-                                placeX = 4.70
-                                placeY = 1.39
+                                placeX = 1.55
+                                placeY = 4.03
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
+
                             elif(wordAux=="dining" or wordAux=="diner" or wordAux=="canteen"):
                                 placeX = 6.47
                                 placeY = 3.51
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
+
                             elif(wordAux=="hall"):
                                 placeX = 1.77
                                 placeY = 0.00
-                        action_client = navigateClient()
-                        future = action_client.send_goal(placeX, placeY)
+                                action_client = navigateClient()
+                                future = action_client.send_goal(placeX, placeY)
+                        
                 
                 elif (word == "search" and word==mensajeFinal[j]):
                     i += 1
@@ -474,13 +501,6 @@ class audioSubscriber(Node):
         archive.write("command_%d|%s|%s\n" % (counter[0],data, oration))
 
     
-
-
-        
-        
-            
-        
-
 def main(args=None):
     
     rclpy.init(args=args)
